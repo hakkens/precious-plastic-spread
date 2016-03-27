@@ -3,7 +3,7 @@ $(function () {
   
   // constants
   var ACCESS_TOKEN = 'pk.eyJ1IjoidG1mcm56IiwiYSI6ImNpbWE3OXQybzAzenV2Ymx1eG1zM2Jzb20ifQ.g617dsajL9ZJ3fz2kpZrrw';
-  var MAP_ID = 'tmfrnz.e2f297b5';
+  var MAP_ID = 'tmfrnz.463d7dbb';
 	var MB_ATTR = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 			'Imagery © <a href="http://mapbox.com">Mapbox</a>';
@@ -12,6 +12,11 @@ $(function () {
   // variables
   var start = '2016-03-24'
   var end = 'today'
+  var clusterRadius = {
+    min : 10,
+    max : 100
+  }
+  
   var interactions = {
     "ga" : {
       "locations" : [],
@@ -27,7 +32,15 @@ $(function () {
       "markers" : L.markerClusterGroup({
         "showCoverageOnHover" : false,
         "spiderfyOnMaxZoom" : true,
-        "maxClusterRadius" : 50
+        "maxClusterRadius" : function(zoom){
+          console.log(zoom)
+          return Math.max(40,Math.min(100,zoom * 12))
+                    
+        },
+        "singleMarkerMode" : true,
+        "iconCreateFunction" : function(cluster){
+          return clusterCreate(cluster)
+        }
       })
     }
   }
@@ -57,6 +70,8 @@ $(function () {
   //////////////////////////////////////////////////////////////////////////////
   
   // functions
+  
+  // interaction data
   var loadGA = function(start,end,callback) {
     // run GA query      
     $.ajax({
@@ -83,7 +98,7 @@ $(function () {
           "lat": row[latIndex],
           "lon": row[lonIndex]
         },
-        "count" : row[countIndex]
+        "count" : parseInt(row[countIndex])
       }
       
     }))
@@ -91,19 +106,28 @@ $(function () {
     mapInteractions({source:'ga',interactions: _.last(interactions.ga.locations)})
     
   }
+  
+  
+  
+  
+  // map 
+  
   var initMap = function(){
     map  = L.map('map', mapOptions)
     L.tileLayer(
       MB_URL, 
-      {attribution: MB_ATTR, id: 'tmfrnz.e2f297b5'}
+      {attribution: MB_ATTR, id: MAP_ID}
     ).addTo(map);
   }
   var mapInteractions = function(args){    
 
     var mapLoaded = function (){
-      console.log('map that shit')
+      console.log('map loaded!')
       layers[args.source].markers.addLayers(_.map(args.interactions, function(interaction){
-        return L.marker(interaction.point)
+        return L.marker(
+          interaction.point,
+          { count : interaction.count }
+        )
       }))
       map.addLayer(layers[args.source].markers)
       map.fitBounds(layers[args.source].markers.getBounds());
@@ -126,6 +150,27 @@ $(function () {
     }
     
   }
+  
+  var clusterCreate = function (cluster) {
+		
+    var sessionCount = 0 
+    _.each(cluster.getAllChildMarkers(),function(marker){
+      sessionCount += marker.options.count
+    })
+    
+		var c = ' marker-cluster-';
+		if (sessionCount < 10) {
+			c += 'small';
+		} else if (sessionCount < 100) {
+			c += 'medium';
+		} else {
+			c += 'large';
+		}
+
+		return new L.DivIcon({ html: '<div class="timo"><span>' + sessionCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+	}
+
+  
   //////////////////////////////////////////////////////////////////////////////
   //utility
   var waitFor = function (condition,callback,s){
