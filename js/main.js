@@ -25,7 +25,7 @@ $(function () {
     }
   }
   var mapOptions = {
-    maxZoom : 12
+    maxZoom : 6
   }
   var layers = {
     "ga" : {
