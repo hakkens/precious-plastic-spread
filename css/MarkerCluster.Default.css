@@ -45,7 +45,7 @@
 	background-clip: padding-box;
 	border-radius: 20px;
 	}
-.marker-cluster div {
+.marker-cluster > div {
 	width: 30px;
 	height: 30px;
 	margin-left: 5px;
@@ -55,6 +55,6 @@
 	border-radius: 15px;
 	font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
 	}
-.marker-cluster span {
+.marker-cluster > div > span {
 	line-height: 30px;
 	}

@@ -10,3 +10,47 @@
     bottom: 0;
     width: 100%;
 }
+
+.marker-cluster-custom {
+  border-radius:10000px ; /* create circle */
+}
+.marker-cluster-custom-ga {
+  background-color:rgba(234, 158, 17, 0.5);
+  border-color:rgb(234, 158, 17);
+}
+.marker-cluster-custom > div {
+    display:none;
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width:auto;
+    height: auto;
+    margin: 0;
+}
+
+.marker-cluster-custom:hover {
+    border-width: 1px;
+    border-style: solid;
+}
+.marker-cluster-custom:hover > div {
+  display:block;
+}
+
+.marker-cluster-custom .leaflet-popup-content-wrapper {
+  border-radius: 6px;
+  position: relative;
+  margin-bottom: 15px;
+  left: -50%;
+}
+
+.marker-cluster-custom .leaflet-popup-content {
+  margin: 4px 12px; 
+  text-align: center;
+}
+
+    
+.leaflet-popup-tip-container {
+    position: absolute;
+    bottom: -5px;
+    left: -20px;
+}

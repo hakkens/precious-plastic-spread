@@ -1,5 +1,4 @@
 $(function () {
-  console.log( "ready!" );
   
   // constants
   var ACCESS_TOKEN = 'pk.eyJ1IjoidG1mcm56IiwiYSI6ImNpbWE3OXQybzAzenV2Ymx1eG1zM2Jzb20ifQ.g617dsajL9ZJ3fz2kpZrrw';
@@ -12,16 +11,17 @@ $(function () {
   // variables
   var start = '2016-03-24'
   var end = 'today'
-  var clusterRadius = {
+  var clusterMarkerRadius = {
     min : 10,
-    max : 100
+    max : 45
   }
   
   var interactions = {
     "ga" : {
       "locations" : [],
       "query" : [],
-      "results" : []
+      "results" : [],
+      "maxValue" : 0
     }
   }
   var mapOptions = {
@@ -32,14 +32,14 @@ $(function () {
       "markers" : L.markerClusterGroup({
         "showCoverageOnHover" : false,
         "spiderfyOnMaxZoom" : true,
-        "maxClusterRadius" : function(zoom){
-          console.log(zoom)
-          return Math.max(40,Math.min(100,zoom * 12))
-                    
-        },
+        "maxClusterRadius" : 40,     
+//        "maxClusterRadius" : function(zoom){
+//          return 40;     
+//        },
+        "spiderfyOnMaxZoom" : false,
         "singleMarkerMode" : true,
         "iconCreateFunction" : function(cluster){
-          return clusterCreate(cluster)
+          return clusterCreate(cluster, 'ga')
         }
       })
     }
@@ -61,12 +61,6 @@ $(function () {
   
   
   
-  $(document).ready(function(){  
-    
-  })
-  
-  
-  
   //////////////////////////////////////////////////////////////////////////////
   
   // functions
@@ -75,16 +69,15 @@ $(function () {
   var loadGA = function(start,end,callback) {
     // run GA query      
     $.ajax({
-      url: "gaQuery.php?start="+start+"&end="+end,
+      url: "gaQuery.php?start="+start+"&end="+end+"&query=location",
       dataType: "JSON",
       success: function(json){
-        console.log( "json!" );
+        console.log( "success loading GA data" );
         callback({'data':json})
       }
     })  
   }
   var gaLoaded = function(args){
-    console.log('gaLoaded!')
     
     var latIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:latitude"})
     var lonIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:longitude"})
@@ -102,6 +95,9 @@ $(function () {
       }
       
     }))
+    interactions.ga.maxValue = _.reduce(args.data.results.rows,function(initial, row){
+      return Math.max(parseInt(row[countIndex]),initial)
+    }, 0) // initial
     
     mapInteractions({source:'ga',interactions: _.last(interactions.ga.locations)})
     
@@ -122,11 +118,12 @@ $(function () {
   var mapInteractions = function(args){    
 
     var mapLoaded = function (){
-      console.log('map loaded!')
       layers[args.source].markers.addLayers(_.map(args.interactions, function(interaction){
         return L.marker(
           interaction.point,
-          { count : interaction.count }
+          { 
+            count : interaction.count
+          }
         )
       }))
       map.addLayer(layers[args.source].markers)
@@ -143,33 +140,50 @@ $(function () {
         // loaded
         mapLoaded()
       }      
-    )
-    
-    var mapLoaded = function (){
-      console.log('map that shit')
-    }
+    )   
     
   }
   
-  var clusterCreate = function (cluster) {
+  var clusterCreate = function (cluster, source) {
 		
     var sessionCount = 0 
+    
     _.each(cluster.getAllChildMarkers(),function(marker){
       sessionCount += marker.options.count
     })
     
-		var c = ' marker-cluster-';
-		if (sessionCount < 10) {
-			c += 'small';
-		} else if (sessionCount < 100) {
-			c += 'medium';
-		} else {
-			c += 'large';
-		}
-
-		return new L.DivIcon({ html: '<div class="timo"><span>' + sessionCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+    var getIconSize = function(value, maxValue) {
+            
+      var rMax = clusterMarkerRadius.max
+      //max Value ~ clusterMarkerRadius.max
+      // scale by area
+      var r = Math.sqrt((rMax*rMax) / (maxValue/value))
+      
+      // make sure at least minimum size
+      return Math.max(clusterMarkerRadius.min, r)
+    }
+    
+    var iconSize = getIconSize(sessionCount, interactions[source].maxValue )
+    
+    var c = ' marker-cluster-custom-'+ source
+    
+		return new L.DivIcon({ 
+      html: '\
+<div>\n\
+<div class="leaflet-popup-content-wrapper">\n\
+<div class="leaflet-popup-content">\n\
+<strong>'+sessionCount+'</strong> visits\n\
+</div>\n\
+</div>\n\
+<div class="leaflet-popup-tip-container">\n\
+<div class="leaflet-popup-tip"></div>\n\
+</div>\n\
+</div>', 
+      className: 'marker-cluster marker-cluster-custom' + c, 
+      iconSize: new L.Point(iconSize, iconSize) 
+    });
 	}
-
+  
   
   //////////////////////////////////////////////////////////////////////////////
   //utility
