@@ -83,9 +83,14 @@ $(function () {
     var lonIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:longitude"})
     var countIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:sessions"})
     
+    // ignore 0/0 locations
+    var rows = _.filter(args.data.results.rows,function(row){
+      return !(parseFloat(row[latIndex]) === 0 && parseFloat(row[lonIndex]) === 0 )
+    })
+    
     interactions.ga.query.push(args.data.query)
     interactions.ga.results.push(args.data.results)
-    interactions.ga.locations.push(_.map(args.data.results.rows,function(row){
+    interactions.ga.locations.push(_.map(rows,function(row){
       return {
         "point" : {
           "lat": row[latIndex],
@@ -95,7 +100,7 @@ $(function () {
       }
       
     }))
-    interactions.ga.maxValue = _.reduce(args.data.results.rows,function(initial, row){
+    interactions.ga.maxValue = _.reduce(rows,function(initial, row){
       return Math.max(parseInt(row[countIndex]),initial)
     }, 0) // initial
     
