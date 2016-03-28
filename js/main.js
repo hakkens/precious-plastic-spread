@@ -45,6 +45,17 @@ $(function () {
     }
   }
   
+  var countryCentroids
+  
+  $.ajax({
+      url: "data/country-centroids.csv",
+      dataType: "text",
+      success: function(csv){
+        console.log( "success loading country centroid data" );
+        countryCentroids = $.csv.toObjects(csv)
+      }
+    })  
+  
   // undefined variables
   var map
   
@@ -82,29 +93,65 @@ $(function () {
     var latIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:latitude"})
     var lonIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:longitude"})
     var countIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:sessions"})
-    
-    // ignore 0/0 locations
-    var rows = _.filter(args.data.results.rows,function(row){
-      return !(parseFloat(row[latIndex]) === 0 && parseFloat(row[lonIndex]) === 0 )
-    })
+    var countryIndex = _.findIndex(args.data.results.columns,function(col){return col.name === "ga:countryIsoCode"})
     
     interactions.ga.query.push(args.data.query)
     interactions.ga.results.push(args.data.results)
-    interactions.ga.locations.push(_.map(rows,function(row){
-      return {
-        "point" : {
-          "lat": row[latIndex],
-          "lon": row[lonIndex]
-        },
-        "count" : parseInt(row[countIndex])
-      }
       
-    }))
-    interactions.ga.maxValue = _.reduce(rows,function(initial, row){
-      return Math.max(parseInt(row[countIndex]),initial)
-    }, 0) // initial
     
-    mapInteractions({source:'ga',interactions: _.last(interactions.ga.locations)})
+    var countriesLoaded = function(){
+      
+      // try by country centroid
+      var rows = _.map(args.data.results.rows,function(row){
+        if (parseFloat(row[latIndex]) === 0 && parseFloat(row[lonIndex]) === 0 ) {
+          
+          // country
+          var country = _.findWhere(countryCentroids,{'ISO2':row[countryIndex]})
+          
+          row[latIndex] = typeof country !== 'undefined' ? country.LAT : 0
+          row[lonIndex] = typeof country !== 'undefined' ? country.LON : 0 
+        }
+        return row
+        
+      })
+      
+      // ignore 0/0 locations
+      var rows = _.filter(rows,function(row){
+        return !(row[latIndex] === 0 && row[lonIndex] === 0 )
+      })      
+      
+      interactions.ga.locations.push(_.map(rows,function(row){
+        return {
+          "point" : {
+            "lat": row[latIndex],
+            "lon": row[lonIndex]
+          },
+          "count" : parseInt(row[countIndex])
+        }
+
+      }))
+      interactions.ga.maxValue = _.reduce(rows,function(initial, row){
+        return Math.max(parseInt(row[countIndex]),initial)
+      }, 0) // initial
+
+      mapInteractions({source:'ga',interactions: _.last(interactions.ga.locations)})
+    }
+    
+        // check for map loaded
+    waitFor(
+      function(){
+        // waiting for
+        return typeof countryCentroids !== 'undefined' 
+      },
+      function(){
+        // loaded
+        countriesLoaded()
+      }      
+    )   
+    
+
+    
+    
     
   }
   

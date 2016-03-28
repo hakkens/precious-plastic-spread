@@ -18,7 +18,7 @@ $count = ($count === 'true');
 
 switch ($query) {
   case 'location':
-    $params = array('dimensions' => 'ga:latitude,ga:longitude','max-results' => 100000);
+    $params = array('dimensions' => 'ga:latitude,ga:longitude,ga:countryIsoCode','max-results' => 100000);
     break;
   case 'city':
     $params = array('dimensions' => 'ga:cityid','max-results' => 100000);

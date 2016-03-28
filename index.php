@@ -23,9 +23,10 @@
   
     <div id="map"></div>
   
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>    
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.js"><\/script>')</script>
     
+    <script src="js/vendor/jquery.csv-0.71.min.js"></script>
     <script src="js/vendor/leaflet/leaflet.js"></script>
     <script src="js/vendor/leaflet/leaflet.markercluster.js"></script>
     <script src="js/vendor/underscore-min.js"></script>
