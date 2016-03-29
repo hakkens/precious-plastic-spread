@@ -25,13 +25,13 @@ $(function () {
     }
   }
   var mapOptions = {
-    maxZoom : 6
+    "maxZoom" : 6,
+    "scrollWheelZoom" : false
   }
   var layers = {
     "ga" : {
       "markers" : L.markerClusterGroup({
         "showCoverageOnHover" : false,
-        "spiderfyOnMaxZoom" : true,
         "maxClusterRadius" : 20,     
 //        "maxClusterRadius" : function(zoom){
 //          return 40;     
@@ -81,7 +81,7 @@ $(function () {
     // run GA query      
     $.ajax({
       url: "gaQuery.php?start="+start+"&end="+end+"&query=location",
-      dataType: "JSON",
+      dataType: "jsonp",
       success: function(json){
         console.log( "success loading GA data" );
         callback({'data':json})

@@ -49,14 +49,25 @@ $gaRows = $gaResults->getRows();
 ?>
 
 <?php if($count) { ?>
-{
+<?php if(isset ($_GET['callback'])) {
+    echo $_GET['callback']. '(';
+  }
+?>{
   "query" : <?php echo json_encode($gaQuery); ?>,
   "results" : {
     "count" : <?php echo count($gaRows); ?>    
   }
 }
+<?php if(isset ($_GET['callback'])) {
+    echo ');';
+}
+?>
 <?php } else { ?>
 <?php $gaColumns = $gaResults->getColumnHeaders();?>  
+<?php if(isset ($_GET['callback'])) {
+    echo $_GET['callback']. '(';
+  }
+?>
 {
   "query" : <?php echo json_encode($gaQuery); ?>,
   "results" : {
@@ -65,4 +76,8 @@ $gaRows = $gaResults->getRows();
     "rows" : <?php echo json_encode($gaRows); ?>
   }
 }  
+<?php if(isset ($_GET['callback'])) {
+    echo ');';
+}
+?>
 <?php } ?>
