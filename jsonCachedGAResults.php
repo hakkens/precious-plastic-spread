@@ -8,6 +8,8 @@ require_once 'ga/getResults.php';
  *  Use server-side caching to store API request's as JSON at a set 
  *  interval, rather than each pageload.
  * 
+ *  based on http://www.kevinleary.net/api-request-caching-json-php/
+ * 
  * @arg Argument description and usage info
  */
 function json_cached_ga_results($gaAccount, $gaKeyFile, $gaQuery, $cache_file = NULL, $expires = NULL ) {
