@@ -12,8 +12,8 @@ $(function () {
   var start = '2016-03-24'
   var end = 'today'
   var clusterMarkerRadius = {
-    min : 10,
-    max : 45
+    min : 7.5,
+    max : 20
   }
   
   var interactions = {
@@ -32,7 +32,7 @@ $(function () {
       "markers" : L.markerClusterGroup({
         "showCoverageOnHover" : false,
         "spiderfyOnMaxZoom" : true,
-        "maxClusterRadius" : 40,     
+        "maxClusterRadius" : 20,     
 //        "maxClusterRadius" : function(zoom){
 //          return 40;     
 //        },
