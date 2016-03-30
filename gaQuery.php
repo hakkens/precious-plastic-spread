@@ -54,13 +54,16 @@ $gaQuery = array(
 if (!$cache) {
 
   $gaResults = getResults($gaAccount, $gaKeyFile, $gaQuery);
-  
+  $gaResults = array(
+      rows => $gaResults->getRows(), 
+      columns => $gaResults->getColumnHeaders(),
+      itemsPerPage => $api_Results[itemsPerPage]
+  );
 } else {
   $gaResults = json_cached_ga_results($gaAccount, $gaKeyFile, $gaQuery, $cache);
 }
 
-// print results
-$gaRows = $gaResults->getRows();
+$gaRows = $gaResults[rows];
 ?>
 
 <?php if($count) { ?>
@@ -78,7 +81,7 @@ $gaRows = $gaResults->getRows();
 }
 ?>
 <?php } else { ?>
-<?php $gaColumns = $gaResults->getColumnHeaders();?>  
+<?php $gaColumns = $gaResults[columns];?>  
 <?php if(isset ($_GET['callback'])) {
     echo $_GET['callback']. '(';
   }
