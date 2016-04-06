@@ -26,6 +26,8 @@ $(function () {
   }
   var mapOptions = {
     "maxZoom" : 6,
+    "zoom" : 2,
+    "center" : [22,0],
     "scrollWheelZoom" : false
   }
   var layers = {
@@ -33,9 +35,6 @@ $(function () {
       "markers" : L.markerClusterGroup({
         "showCoverageOnHover" : false,
         "maxClusterRadius" : 20,     
-//        "maxClusterRadius" : function(zoom){
-//          return 40;     
-//        },
         "spiderfyOnMaxZoom" : false,
         "singleMarkerMode" : true,
         "iconCreateFunction" : function(cluster){
@@ -179,7 +178,6 @@ $(function () {
         )
       }))
       map.addLayer(layers[args.source].markers)
-      map.fitBounds(layers[args.source].markers.getBounds());
     }    
     
     // check for map loaded
