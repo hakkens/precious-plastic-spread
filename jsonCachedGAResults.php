@@ -26,11 +26,7 @@ function json_cached_ga_results($gaAccount, $gaKeyFile, $gaQuery, $cache_file = 
         // File is too old, refresh cache
         // get results from GOOGLE API
         $api_results = getResults($gaAccount, $gaKeyFile, $gaQuery);
-        $json_results = json_encode(array(
-            rows => $api_results->getRows(), 
-            columns => $api_results->getColumnHeaders(),
-            itemsPerPage => $api_Results[itemsPerPage]
-        ));
+        $json_results = json_encode($api_results);
         
         // Remove cache file on error to avoid writing wrong xml
         if ( $api_results && $json_results )

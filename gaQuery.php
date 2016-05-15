@@ -22,7 +22,7 @@ $gaKeyFile = './client_secrets.p12';
 $gaProfile = '110350856'; //the precisouplastic profileid
 switch ($query) {
   case 'location':
-    $params = array('dimensions' => 'ga:latitude,ga:longitude,ga:countryIsoCode','max-results' => 100000);
+    $params = array('dimensions' => 'ga:latitude,ga:longitude,ga:countryIsoCode','max-results' => 10000);
     $cache = './cache/ga-api-cache-locations.json';
     break;
   case 'city':
@@ -54,11 +54,7 @@ $gaQuery = array(
 if (!$cache) {
 
   $gaResults = getResults($gaAccount, $gaKeyFile, $gaQuery);
-  $gaResults = array(
-      rows => $gaResults->getRows(), 
-      columns => $gaResults->getColumnHeaders(),
-      itemsPerPage => $api_Results[itemsPerPage]
-  );
+
 } else {
   $gaResults = json_cached_ga_results($gaAccount, $gaKeyFile, $gaQuery, $cache);
 }
