@@ -27,8 +27,10 @@
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.js"><\/script>')</script>
     
     <script src="js/vendor/jquery.csv-0.71.min.js"></script>
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyAXfNRv2zmK1b9E3pgrrjXXFEsCUjAANAo&v=3"></script>        
     <script src="js/vendor/leaflet/leaflet.js"></script>
-    <script src="js/vendor/leaflet/leaflet.markercluster.js"></script>
+    <script src="js/vendor/leaflet/leafllet-plugins-google.js"></script>    
+    <script src="js/vendor/leaflet/leaflet.markercluster.js"></script>    
     <script src="js/vendor/underscore-min.js"></script>
 
     <script src="js/main.js"></script>    
